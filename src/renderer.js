@@ -10,12 +10,20 @@ const randomColor = require('randomcolor')
 const flatpickr = require('flatpickr')
 // user prompt and dialog library
 var vex = require('vex-js')
-vex.registerPlugin(require('vex-dialog'))
-vex.defaultOptions.className = 'vex-theme-plain'
 // file IO
 const fs = require('fs')
+// path that stores graph data
+const DATA_PATH = './data/data.json'
 
-let file = fs.readFileSync('./data/data.json')
+// bind DOM elements to flatpickr
+flatpickr('.flatpickr', {
+  enableTime: true
+})
+// set up vex theme
+vex.registerPlugin(require('vex-dialog'))
+vex.defaultOptions.className = 'vex-theme-plain'
+
+let file = fs.readFileSync(DATA_PATH)
 // data structure
 // [
 //   {
@@ -84,22 +92,32 @@ function addTask(name) {
     task: name,
     log: []
   })
+  writeTasksToFile(DATA_PATH)
 }
 
 // remove task at index in tasks[]
 function removeTask(index) {
   tasks.splice(index, 1)
+  writeTasksToFile(DATA_PATH)
 }
 
 // input: index of task, start (moment.js), end (moment.js)
 function pushEntry(index, start, end) {
   tasks[index].log.push([start, end])
+  writeTasksToFile(DATA_PATH)
 }
 
 // remove most recent entry
 // input: index of task
 function popEntry(index) {
   tasks[index].log.pop()
+  writeTasksToFile(DATA_PATH)
+}
+
+// stores tasks[] on local disk
+function writeTasksToFile(file) {
+  let data = JSON.stringify(tasks)
+  fs.writeFileSync(file, data)
 }
 
 // add / remove new task from DOM task selector
@@ -168,7 +186,3 @@ refreshChart(chart)
 updateTaskSelector()
 // display entries corresponding to selected task
 updateDOMEntries(taskSelector.value)
-
-flatpickr('.flatpickr', {
-  enableTime: true
-})
