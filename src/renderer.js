@@ -15,10 +15,36 @@ const fs = require('fs')
 // path that stores graph data
 const DATA_PATH = './data/data.json'
 
-// bind DOM elements to flatpickr
-flatpickr('.flatpickr', {
-  enableTime: true
+// entry start and end time
+var addEntryStart = document.getElementById('addEntryStart')
+var addEntryEnd = document.getElementById('addEntryEnd')
+// bind start time selector to flatpickr
+const fpStart = flatpickr(addEntryStart, {
+  enableTime: true,
+  maxDate: moment().toDate(),
+  // restrict selectable range of end date to after start date
+  onChange: function(selectedDates, dateStr, instance) {
+    fpEnd.config.minDate = dateStr
+  }
 })
+// bind end time selector to flatpickr
+const fpEnd = flatpickr(addEntryEnd, {
+  enableTime: true,
+  maxDate: moment().toDate(),
+  // restrict selectable range of start date to before end date
+  onChange: function(selectedDates, dateStr, instance) {
+    fpStart.config.maxDate = dateStr
+  }
+})
+
+// clear date restrictions in start and end time pickers
+function refreshFp() {
+  fpStart.config.minDate = null
+  fpEnd.config.minDate = null
+  fpStart.config.maxDate = moment().toDate()
+  fpEnd.config.maxDate = moment().toDate()
+}
+
 // set up vex theme
 vex.registerPlugin(require('vex-dialog'))
 vex.defaultOptions.className = 'vex-theme-plain'
@@ -122,24 +148,34 @@ function writeTasksToFile(file) {
 
 // add / remove new task from DOM task selector
 function updateTaskSelector() {
-  // clear current tasks & entries
+  // clear current tasks
   taskSelector.innerHTML = `<option value="edit">Edit...</option>`
   // populate tasks with new data
   for (let i = 0; i < tasks.length; i++) {
     taskSelector.innerHTML = `<option value="${i}">${tasks[i].task}</option>` + taskSelector.innerHTML
   }
+  // display entries of the latest task
   updateDOMEntries(tasks.length - 1)
 }
 
 // show entries of task at index in DOM
 function updateDOMEntries(index) {
+  // clear date restrictions in end time pickers
+  refreshFp()
+  // clear existing entries
   entries.innerHTML = ''
   if (index >= 0) {
     tasks[index].log.forEach(entry => {
       let start = moment(entry[0]).format('ddd MMM D YYYY, h:mmA')
       let end = moment(entry[1]).format('ddd MMM D YYYY, h:mmA')
       entries.innerHTML = `<p>start: ${start} &nbsp &nbsp end: ${end}</p>` + entries.innerHTML
+      // restrict datetime selector to time after last entry
+      fpStart.config.minDate = moment(entry[1]).toDate()
+      fpEnd.config.minDate = moment(entry[1]).toDate()
     })
+    // clear selected dates in DOM
+    addEntryStart.value = ''
+    addEntryEnd.value = ''
   }
 }
 

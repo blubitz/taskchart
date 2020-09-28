@@ -24,10 +24,10 @@
     <button type="button" id="newTask">+ New task</button>
     <canvas id="chart"></canvas>
     <select id="task"></select>
-    <input id="addEntryStart" class="flatpickr" type="text" placeholder="start">
-    <input id="addEntryEnd" class="flatpickr" type="text" placeholder="end">
+    <input id="addEntryStart" type="text" placeholder="start time">
+    <input id="addEntryEnd" type="text" placeholder="end time">
     <button id="addEntry">Add</button>
-    <button id='revertEntry'>Revert Last Entry</button>`
+    <button id="revertEntry">Revert Last Entry</button>
     <div id="entries"></div>
   </div>
 </body>
@@ -43,9 +43,6 @@ var range = document.getElementById('range')
 var newTask = document.getElementById('newTask')
 // entry adder
 var addEntry = document.getElementById('addEntry')
-// entry start and end time
-var addEntryStart = document.getElementById('addEntryStart')
-var addEntryEnd = document.getElementById('addEntryEnd')
 // entry remover
 var revertEntry = document.getElementById('revertEntry')
 
@@ -57,6 +54,7 @@ range.addEventListener('change', function() {
 // switch the entries displayed when task is changed
 taskSelector.addEventListener('change', function() {
   if (this.value == "edit") {
+
     let input = ''
     let options = taskSelector.getElementsByTagName('option')
     // list up til the second last item (last item is edit button)
@@ -67,12 +65,12 @@ taskSelector.addEventListener('change', function() {
       <label for="remove-${index}">${options[i].innerText}</label><br>
       `
     }
+    // ------------------- Prompt ------------------------
     vex.dialog.open({
       message: 'Select task to remove',
       input: input,
       callback: function(data) {
         if (data.task != null) {
-          console.log(data)
           removeTask(parseInt(data.task))
           // display data in chart
           refreshChart(chart)
@@ -83,8 +81,14 @@ taskSelector.addEventListener('change', function() {
         updateDOMEntries(taskSelector.value)
       }
     })
-  } else {
+    // ------------------------------------------------------
+  }
+  else {
+
     updateDOMEntries(parseInt(this.value))
+    // clear selected dates in DOM
+    addEntryStart.value = ''
+    addEntryEnd.value = ''
   }
 })
 
