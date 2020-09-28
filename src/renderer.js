@@ -4,6 +4,8 @@ const moment = require('moment')
 const Chart = require('chart.js')
 // zoom and pan library
 const zoom = require('chartjs-plugin-zoom')
+// random color generator library
+const randomColor = require('randomcolor')
 // file IO
 const fs = require('fs')
 
@@ -33,7 +35,7 @@ for (let i = 0; i < tasks.length; i++) {
   datasets.push({
     label: label,
     data: logToData(log),
-    fill: false,  // remove area fill
+    backgroundColor: randomColor({format: 'rgba', alpha: 0.5}),
     lineTension: 0  // no curve lines
   })
 }
@@ -69,7 +71,8 @@ function updateScale(chart, unit) {
 
   chart.options.scales.xAxes[0] = {
     type: 'time',
-    time: timeFormat
+    time: timeFormat,
+    scaleLabel: {display: true, labelString: 'date'}
   };
   chart.update();
 }
@@ -80,7 +83,8 @@ var chart = new Chart(ctx, {
   data: { datasets: datasets },
   options: {
     scales: {
-      xAxes: [{ type: 'time', time: timeFormat }]
+      xAxes: [{ type: 'time', time: timeFormat, scaleLabel: {display: true, labelString: 'Date'} }],
+      yAxes: [{ scaleLabel: {display: true, labelString: 'Total Hours'} }]
     },
     plugins: {
       zoom: {
