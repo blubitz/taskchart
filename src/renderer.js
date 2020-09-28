@@ -6,6 +6,12 @@ const Chart = require('chart.js')
 const zoom = require('chartjs-plugin-zoom')
 // random color generator library
 const randomColor = require('randomcolor')
+// date and time selector
+const flatpickr = require('flatpickr')
+// user prompt and dialog library
+var vex = require('vex-js')
+vex.registerPlugin(require('vex-dialog'))
+vex.defaultOptions.className = 'vex-theme-plain'
 // file IO
 const fs = require('fs')
 
@@ -13,31 +19,45 @@ let file = fs.readFileSync('./data/data.json')
 // data structure
 // [
 //   {
-//     title: "task1",
-//     data: [
+//     task: "task1",
+//     log: [
 //       ["2020-01-01", "2020-01-02"],
 //       ["2020-01-03", "2020-01-04"]
 //     ]
-//   }
+//   }...
 // ]
+
+// stateless object refernced by DOM
 var tasks = JSON.parse(file)
 
 // canvas DOM
 var ctx = document.getElementById('chart').getContext('2d')
-// graph coordinates
-var datasets = []
+// task selector
+var taskSelector = document.getElementById('task')
+// entry display
+var entries = document.getElementById('entries')
 
-// iterate tasks
-for (let i = 0; i < tasks.length; i++) {
-  let label = tasks[i].task
-  let log = tasks[i].log
-  // data set element
-  datasets.push({
-    label: label,
-    data: logToData(log),
-    backgroundColor: randomColor({format: 'rgba', alpha: 0.5}),
-    lineTension: 0  // no curve lines
-  })
+
+// update chart datasets using tasks[]
+function refreshChart(chart) {
+  // clear previous data
+  chart.data.datasets = []
+
+  // iterate tasks loading new data
+  for (let i = 0; i < tasks.length; i++) {
+    let label = tasks[i].task
+    let log = tasks[i].log
+    // data set element
+    chart.data.datasets.push({
+      label: label,
+      data: logToData(log),
+      backgroundColor: randomColor({format: 'rgba', alpha: 0.1}),
+      lineTension: 0  // no curve lines
+    })
+  }
+
+  // display in DOM
+  chart.update()
 }
 
 // take log object and convert to graph coordinates
@@ -55,6 +75,52 @@ function logToData(log) {
     data.push({x: end, y: comulativeHrs})
   }
   return data
+}
+
+// push new task to tasks[]
+// input: task name
+function addTask(name) {
+  tasks.push({
+    task: name,
+    log: []
+  })
+}
+
+// remove task at index in tasks[]
+function removeTask(index) {
+  tasks.splice(index, 1)
+}
+
+// input: index of task, start (moment.js), end (moment.js)
+function pushEntry(index, start, end) {
+  tasks[index].log.push([start, end])
+}
+
+// remove most recent entry
+// input: index of task
+function popEntry(index) {
+  tasks[index].log.pop()
+}
+
+// add / remove new task from DOM task selector
+function updateTaskSelector() {
+  // clear current tasks & entries
+  taskSelector.innerHTML = `<option value="edit">Edit...</option>`
+  // populate tasks with new data
+  for (let i = 0; i < tasks.length; i++) {
+    taskSelector.innerHTML = `<option value="${i}">${tasks[i].task}</option>` + taskSelector.innerHTML
+  }
+  updateDOMEntries(tasks.length - 1)
+}
+
+// show entries of task at index in DOM
+function updateDOMEntries(index) {
+  entries.innerHTML = ''
+  if (index >= 0) {
+    tasks[index].log.forEach(entry => {
+      entries.innerHTML = `<p>start: ${entry[0]} &nbsp &nbsp end: ${entry[1]}</p>` + entries.innerHTML
+    })
+  }
 }
 
 // default time
@@ -80,7 +146,6 @@ function updateScale(chart, unit) {
 // create chart and append to DOM
 var chart = new Chart(ctx, {
   type: 'line',
-  data: { datasets: datasets },
   options: {
     scales: {
       xAxes: [{ type: 'time', time: timeFormat, scaleLabel: {display: true, labelString: 'Date'} }],
@@ -89,8 +154,19 @@ var chart = new Chart(ctx, {
     plugins: {
       zoom: {
         pan: { enabled: true, mode: 'x' },
-        zoom: { enabled: true, mode: 'x', speed: 0.02}
+        zoom: { enabled: true, mode: 'x', speed: 0.02 }
       }
     }
   }
 });
+
+// display data in chart
+refreshChart(chart)
+// populate selector with tasks
+updateTaskSelector()
+// display entries corresponding to selected task
+updateDOMEntries(taskSelector.value)
+
+flatpickr('.flatpickr', {
+  enableTime: true
+})

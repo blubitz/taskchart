@@ -1,11 +1,26 @@
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: sans-serif;
+}
+#wrapper {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial;
   margin: auto;
-  max-width: 38rem;
+  width: 80vw;
   padding: 2rem;
 }
-
 #chart {
   /* width: 300px; */
   height: 300px;
+}
+#newTask, #revertEntry {
+  float: right;
+}
+.selectable:hover {
+  background: #808080;
+}
+.vex.vex-theme-plain .vex-dialog-button:focus {
+  /* override flashing animation */
+  animation: none !important;
+}
+.vex.vex-theme-plain .vex-dialog-button.vex-dialog-button-primary {
+  background: #000 !important;
 }

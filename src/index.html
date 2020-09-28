@@ -4,25 +4,126 @@
   <meta charset="UTF-8">
   <title>TaskChart</title>
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="../node_modules/vex-js/dist/css/vex.css">
+  <link rel="stylesheet" href="../node_modules/vex-js/dist/css/vex-theme-plain.css">
 </head>
 <body>
-  <h1>💖 Hello World!</h1>
-  <p>Welcome to your Electron application.</p>
-  <select id="range">
-    <option value="auto">Auto</option>
-    <option value="hour">Hour</option>
-    <option value="day">Day</option>
-    <option value="week">Week</option>
-    <option value="month">Month</option>
-    <option value="quarter">Quarter</option>
-    <option value="year">Year</option>
-  </select>
-  <canvas id="chart"></canvas>
+  <div id="wrapper">
+    <h1>💖 Hello World!</h1>
+    <p>Welcome to your Electron application.</p>
+    <span>Range: </span>
+    <select id="range">
+      <option value="auto">Auto</option>
+      <option value="hour">Hour</option>
+      <option value="day">Day</option>
+      <option value="week">Week</option>
+      <option value="month">Month</option>
+      <option value="quarter">Quarter</option>
+      <option value="year">Year</option>
+    </select>
+    <button type="button" id="newTask">+ New task</button>
+    <canvas id="chart"></canvas>
+    <select id="task"></select>
+    <input id="addEntryStart" class="flatpickr" type="text" placeholder="start">
+    <input id="addEntryEnd" class="flatpickr" type="text" placeholder="end">
+    <button id="addEntry">Add</button>
+    <button id='revertEntry'>Revert Last Entry</button>`
+    <div id="entries"></div>
+  </div>
 </body>
+
 <script src="./renderer.js" charset="utf-8"></script>
+<!-- the stylesheet is only accessable after requiring flatpickr -->
+<link rel="stylesheet" href="../node_modules/flatpickr/dist/flatpickr.min.css">
+
 <script>
-document.getElementById('range').addEventListener('change', function() {
+// range selector
+var range = document.getElementById('range')
+// task adder
+var newTask = document.getElementById('newTask')
+// entry adder
+var addEntry = document.getElementById('addEntry')
+// entry start and end time
+var addEntryStart = document.getElementById('addEntryStart')
+var addEntryEnd = document.getElementById('addEntryEnd')
+// entry remover
+var revertEntry = document.getElementById('revertEntry')
+
+// change the scale of the x-axis to selected timeframe
+range.addEventListener('change', function() {
   updateScale(chart, this.value)
+})
+
+// switch the entries displayed when task is changed
+taskSelector.addEventListener('change', function() {
+  if (this.value == "edit") {
+    let input = ''
+    let options = taskSelector.getElementsByTagName('option')
+    // list up til the second last item (last item is edit button)
+    for (let i = 0; i < options.length - 1; i++) {
+      let index = options[i].getAttribute("value")
+      input += `
+      <input type="radio" id="remove-${index}" name="task" value="${index}">
+      <label for="remove-${index}">${options[i].innerText}</label><br>
+      `
+    }
+    vex.dialog.open({
+      message: 'Select task to remove',
+      input: input,
+      callback: function(data) {
+        if (data.task != null) {
+          console.log(data)
+          removeTask(parseInt(data.task))
+          // display data in chart
+          refreshChart(chart)
+        }
+        // add task to selector
+        updateTaskSelector()
+        // display entries corresponding to selected task
+        updateDOMEntries(taskSelector.value)
+      }
+    })
+  } else {
+    updateDOMEntries(parseInt(this.value))
+  }
+})
+
+newTask.addEventListener('click', function() {
+  vex.dialog.prompt({
+    message: 'Task name',
+    placeholder: 'fantastic homework',
+    callback: function (value) {
+      if (value != '') {
+        addTask(value)
+        // display data in chart
+        refreshChart(chart)
+        // add task to selector
+        updateTaskSelector()
+        // display entries corresponding to selected task
+        updateDOMEntries(taskSelector.value)
+      }
+    }
+  })
+})
+
+addEntry.addEventListener('click', function() {
+  let start = addEntryStart.value
+  let end = addEntryEnd.value
+  if ((start + end).length > 0) {
+    pushEntry(taskSelector.value, moment(start), moment(end))
+  }
+  // display data in chart
+  refreshChart(chart)
+  // display entries corresponding to selected task
+  updateDOMEntries(taskSelector.value)
+})
+
+revertEntry.addEventListener('click', function() {
+  popEntry(taskSelector.value)
+  // display data in chart
+  refreshChart(chart)
+  // display entries corresponding to selected task
+  updateDOMEntries(taskSelector.value)
 })
 </script>
 </html>
