@@ -2,9 +2,7 @@
 a task activity timeline
 ## Getting Started
 ### Installation
-Download latest version:
-- [v1.0.0-alpha (macOS)](https://github.com/blubitz/taskchart/releases/download/v1.0.0-alpha/taskchart.app.zip)
-- [v1.0.0-alpha (Windows)](https://github.com/blubitz/taskchart/releases/download/v1.0.0-alpha/taskchart-win.zip)
+See latest version in [releases](https://github.com/blubitz/taskchart/releases)
 ## Development
 1. clone/download repository
 2. run `npm install`
