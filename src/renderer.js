@@ -2,6 +2,8 @@
 const moment = require('moment')
 // chart library
 const Chart = require('chart.js')
+// zoom and pan library
+const zoom = require('chartjs-plugin-zoom')
 // file IO
 const fs = require('fs')
 
@@ -16,8 +18,11 @@ let file = fs.readFileSync('./data/data.json')
 //     ]
 //   }
 // ]
-let tasks = JSON.parse(file)
+var tasks = JSON.parse(file)
 
+// canvas DOM
+var ctx = document.getElementById('chart').getContext('2d')
+// graph coordinates
 var datasets = []
 
 // iterate tasks
@@ -28,6 +33,7 @@ for (let i = 0; i < tasks.length; i++) {
   datasets.push({
     label: label,
     data: logToData(log),
+    fill: false,  // remove area fill
     lineTension: 0  // no curve lines
   })
 }
@@ -49,11 +55,38 @@ function logToData(log) {
   return data
 }
 
-var ctx = document.getElementById('chart').getContext('2d')
+// default time
+var timeFormat = {
+  minUnit: 'hour',
+  displayFormats: {
+    hour: 'MMM D hA'
+  }
+}
+
+// adjust the scale of the ticks to unit
+function updateScale(chart, unit) {
+  timeFormat.unit = (unit == 'auto') ? false : unit
+
+  chart.options.scales.xAxes[0] = {
+    type: 'time',
+    time: timeFormat
+  };
+  chart.update();
+}
+
+// create chart and append to DOM
 var chart = new Chart(ctx, {
   type: 'line',
-  data: { datasets: datasets},
+  data: { datasets: datasets },
   options: {
-    scales: { xAxes: [{type: 'time'}] }
+    scales: {
+      xAxes: [{ type: 'time', time: timeFormat }]
+    },
+    plugins: {
+      zoom: {
+        pan: { enabled: true, mode: 'x' },
+        zoom: { enabled: true, mode: 'x', speed: 0.02}
+      }
+    }
   }
 });

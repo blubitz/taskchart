@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "chart.js": "^2.9.3",
+    "chartjs-plugin-zoom": "^0.7.7",
     "electron-squirrel-startup": "^1.0.0",
     "moment": "^2.29.0"
   },

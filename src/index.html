@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>TaskChart</title>
-    <link rel="stylesheet" href="index.css">
-  </head>
-  <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
-    <canvas id="chart"></canvas>
-  </body>
-  <script src="./renderer.js" charset="utf-8"></script>
+<head>
+  <meta charset="UTF-8">
+  <title>TaskChart</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <h1>💖 Hello World!</h1>
+  <p>Welcome to your Electron application.</p>
+  <select id="range">
+    <option value="auto">Auto</option>
+    <option value="hour">Hour</option>
+    <option value="day">Day</option>
+    <option value="week">Week</option>
+    <option value="month">Month</option>
+    <option value="quarter">Quarter</option>
+    <option value="year">Year</option>
+  </select>
+  <canvas id="chart"></canvas>
+</body>
+<script src="./renderer.js" charset="utf-8"></script>
+<script>
+document.getElementById('range').addEventListener('change', function() {
+  updateScale(chart, this.value)
+})
+</script>
 </html>
