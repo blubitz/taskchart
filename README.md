@@ -16,6 +16,7 @@ Download latest version:
 4. Any feedback! 💬
 ## LICENSE
 MIT
+
 app icon by [icons8](https://icons8.com/) [(CC BY-ND 3.0)](https://www.creativecommons.org/licenses/by-nd/3.0/legalcode)
 ## Copyright
 Copyright 2020 blubitz
