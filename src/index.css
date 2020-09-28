@@ -14,8 +14,15 @@ body {
 #newTask, #revertEntry {
   float: right;
 }
-.selectable:hover {
-  background: #808080;
+#entries {
+  margin-top: 14px;
+  padding: 8px;
+  max-height: 250px;
+  overflow: scroll;
+}
+#entries p {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #8a8c8c;
 }
 .vex.vex-theme-plain .vex-dialog-button:focus {
   /* override flashing animation */

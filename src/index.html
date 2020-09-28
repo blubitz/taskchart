@@ -116,6 +116,9 @@ addEntry.addEventListener('click', function() {
   refreshChart(chart)
   // display entries corresponding to selected task
   updateDOMEntries(taskSelector.value)
+  // clear selected dates in DOM
+  addEntryStart.value = ''
+  addEntryEnd.value = ''
 })
 
 revertEntry.addEventListener('click', function() {

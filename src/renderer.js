@@ -118,7 +118,9 @@ function updateDOMEntries(index) {
   entries.innerHTML = ''
   if (index >= 0) {
     tasks[index].log.forEach(entry => {
-      entries.innerHTML = `<p>start: ${entry[0]} &nbsp &nbsp end: ${entry[1]}</p>` + entries.innerHTML
+      let start = moment(entry[0]).format('ddd MMM D YYYY, h:mmA')
+      let end = moment(entry[1]).format('ddd MMM D YYYY, h:mmA')
+      entries.innerHTML = `<p>start: ${start} &nbsp &nbsp end: ${end}</p>` + entries.innerHTML
     })
   }
 }
