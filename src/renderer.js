@@ -12,8 +12,10 @@ const flatpickr = require('flatpickr')
 var vex = require('vex-js')
 // file IO
 const fs = require('fs')
+// file path manager
+const path = require('path')
 // path that stores graph data
-const DATA_PATH = './data/data.json'
+const DATA_PATH = path.join(__dirname, '../data/data.json')
 
 // entry start and end time
 var addEntryStart = document.getElementById('addEntryStart')

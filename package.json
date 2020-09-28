@@ -13,9 +13,9 @@
   },
   "keywords": [],
   "author": {
-    "name": "***REMOVED***"
+    "name": "blubitz"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {},
