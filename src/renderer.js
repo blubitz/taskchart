@@ -107,7 +107,8 @@ function logToData(log) {
     let start = log[i][0]
     let end = log[i][1]
     data.push({x: start, y: comulativeHrs})
-    comulativeHrs += moment(end).diff(moment(start), 'hours')
+    let duration = moment(end).diff(moment(start), 'minutes')
+    comulativeHrs += Math.round(duration / 60 * 10) / 10
     data.push({x: end, y: comulativeHrs})
   }
   return data
